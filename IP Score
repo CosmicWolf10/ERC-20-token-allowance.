@@ -1,0 +1,64 @@
+// Assuming you have already set up Web3 and connected to an Ethereum provider (like MetaMask).
+
+const Web3 = require('web3');
+const web3 = new Web3(window.ethereum); // Assuming you are using MetaMask as the provider.
+
+// ERC-20 Token ABI (simplified version with the approve function).
+const tokenABI = [
+    {
+        "constant": false,
+        "inputs": [
+            {
+                "name": "spender",
+                "type": "address"
+            },
+            {
+                "name": "amount",
+                "type": "uint256"
+            }
+        ],
+        "name": "approve",
+        "outputs": [
+            {
+                "name": "",
+                "type": "bool"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
+    }
+];
+
+// The ERC-20 token contract address (replace with actual token address).
+const tokenAddress = "0xYourTokenAddressHere"; 
+
+// The spender's address (replace with the address that will be allowed to spend tokens).
+const spenderAddress = "0xSpenderAddressHere"; 
+
+// The amount of tokens to approve (in the token's smallest unit, e.g., wei).
+const amountToApprove = web3.utils.toWei("100", "ether"); // 100 tokens (adjust the unit based on your token's decimals).
+
+// Function to approve the token allowance.
+async function approveTokenAllowance() {
+    // Get the user's accounts from MetaMask or other wallet.
+    const accounts = await web3.eth.requestAccounts();
+    const senderAddress = accounts[0]; // The address that will approve the allowance.
+
+    // Create a contract instance for the token.
+    const tokenContract = new web3.eth.Contract(tokenABI, tokenAddress);
+
+    try {
+        // Approve the spender to spend the specified amount of tokens.
+        const result = await tokenContract.methods
+            .approve(spenderAddress, amountToApprove)
+            .send({ from: senderAddress });
+
+        console.log("Approval successful:", result);
+    } catch (error) {
+        console.error("Approval failed:", error);
+    }
+}
+
+// Call the function to approve the allowance.
+approveTokenAllowance();
